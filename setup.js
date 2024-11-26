@@ -4,7 +4,7 @@ var fs = require('fs')
 var os = require('os')
 var path = require('path')
 
-if (__dirname !== sh.pwd()) {
+if (__dirname !== sh.pwd().stdout) {
   console.error("need to run the script from its directory")
   process.exit(1)
 }
@@ -17,7 +17,7 @@ function getNixDistro() {
                     distroProps[ss[0]] = ss[1]
                 })
   return { distro: distroProps
-         , arch: {"x86_64": "x64", "i386": "i386"}[sh.exec("uname -m").output.trim()]}
+         , arch: {"x86_64": "x64", "i386": "i386"}[sh.exec("uname -m").stdout.trim()]}
 }
 
 function makeNixVersion(os) {
@@ -28,8 +28,10 @@ function makeNixVersion(os) {
 // download the client linux utorrent 
 function downloadUTServer(target) {
   var file = fs.createWriteStream(target)
-  var url = "http://download-new.utorrent.com/os/" + makeNixVersion(getNixDistro()) + "/track/beta/endpoint/utserver/"
-  var request = http.get(url, function(response) {response.pipe(file)})
+  // var url = "http://download-new.utorrent.com/os/" + makeNixVersion(getNixDistro()) + "/track/beta/endpoint/utserver/"
+  var url = "http://download.utorrent.com/linux/utorrent-server-3.0-25053.tar.gz"
+  // var request = http.get(url, function(response) {response.pipe(file)})
+  sh.exec("wget " + url + " -O " + target)
 }
 
 var nixDistro = getNixDistro()
@@ -72,11 +74,11 @@ function createTestSetup(utServerBinDir) {
 }
 
 function addNonHackageDeps() {
-  var deps = ["https://github.com/danoctavian/tcp-proxy"
-  , "https://github.com/danoctavian/shepherd"
-  , "https://github.com/danoctavian/helligator"
-  , "https://github.com/danoctavian/free-network-protocol"
-  , "https://github.com/danoctavian/bittorrent-client-control"]
+  var deps = ["https://github.com/asians-cloud/tcp-proxy"
+  , "https://github.com/asians-cloud/shepherd"
+  , "https://github.com/asians-cloud/helligator"
+  , "https://github.com/asians-cloud/free-network-protocol"
+  , "https://github.com/asians-cloud/bittorrent-client-control"]
   for (i in deps) {
     sh.exec("git clone " + deps[i])
   }
